@@ -1,0 +1,5 @@
+{
+    "checkIntervalSeconds": 300,
+    "resendApiKey": "re_your_api_key_here",
+    "emailFrom": "[EMAIL_ADDRESS]"
+}

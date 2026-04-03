@@ -1,0 +1,17 @@
+services:
+  tracker:
+    build:
+      target: dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/db:/app/db
+
+  frontend:
+    build:
+      target: development-dependencies-env
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules

@@ -1,13 +1,51 @@
 services:
   tracker:
-    build: .
-    container_name: amazon-item-tracker
+    build: ./backend
+    container_name: item-tracker-server
+    env_file:
+      - ./.env
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME:-item_tracker}
+    ports:
+      - "3001:3001"
     volumes:
-      - ./config:/app/config
+      - ./backend/config:/app/config
     restart: unless-stopped
-    # Use dumb-init if needed to signal correct exit
     init: true 
-    # Ensure memory limits are reasonable for Chrome
     shm_size: '1gb' 
     cap_add:
-      - SYS_ADMIN # Required for Chrome sandbox/puppeteer in rare cases, but usually fine without in modern kernels with unprivileged sandbox.
+      - SYS_ADMIN 
+    depends_on:
+      - db
+  
+  frontend:
+    build: ./frontend
+    container_name: item-tracker
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - tracker
+
+  db:
+    image: postgres:18-alpine
+    container_name: item-tracker-db
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME:-item_tracker}
+    volumes:
+      - item_tracker_db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5432"
+    restart: unless-stopped
+
+volumes:
+  item_tracker_db_data:
