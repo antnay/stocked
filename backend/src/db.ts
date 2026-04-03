@@ -108,6 +108,16 @@ export class Database {
         const res = await this.pool.query("SELECT items.*, user_items.user_id, \"user\".email FROM items JOIN user_items ON items.id = user_items.item_id JOIN \"user\" ON user_items.user_id = \"user\".id");
         return res.rows;
     }
+
+    async getConfig(): Promise<Config> {
+        const res = await this.pool.query("SELECT * FROM config");
+        return res.rows[0];
+    }
+
+    async updateConfig(checkIntervalSeconds: number, resendApiKey: string, emailFrom: string) {
+        const res = await this.pool.query("UPDATE config SET check_interval_seconds = $1, resend_api_key = $2, email_from = $3", [checkIntervalSeconds, resendApiKey, emailFrom]);
+        return res.rows[0];
+    }
 }
 
 export interface Item {
@@ -144,5 +154,11 @@ export interface AllItemsAndUsers {
     lastStatus: Status;
     createdAt: Date;
     users: User[];
+}
+
+export interface Config {
+    interval: number;
+    resendApiKey: string;
+    emailFrom: string;
 }
 

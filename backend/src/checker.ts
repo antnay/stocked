@@ -1,11 +1,11 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { Resend } from 'resend';
-import { Database, Website, Status, Item } from './db';
+import { Database, Website, Status, Item, Config } from './db';
 import { amazonOpenItems } from './websites/amazon';
 import { targetOpenItems } from './websites/target';
 import { vibramOpenItems } from './websites/vibram';
-import { Config, loadConfig, sendNotification } from './helpers';
+import { sendNotification } from './helpers';
+import { exit } from 'node:process';
 
 puppeteer.use(StealthPlugin());
 
@@ -15,20 +15,20 @@ const scrapers = {
     [Website.AMAZON]: amazonOpenItems,
 };
 
-export async function checkStock(db: Database, config: Config) {
+export async function checkStock(db: Database) {
     while (true) {
         let currentConfig: Config;
         try {
-            currentConfig = loadConfig();
+            currentConfig = await db.getConfig();
         } catch (e) {
-            console.error("Failed to reload config, using previous config", e);
-            currentConfig = config;
+            console.error("Failed to reload config", e);
+            exit(1);
         }
-        const checkInterval = (currentConfig.checkIntervalSeconds || 300) * 1000;
+        const checkInterval = (currentConfig.interval || 300) * 1000;
         const allItemsAndUsers = await db.getAllItemsAndUsers();
-        
+
         // Group items by unique id, collecting all attached emails
-        const itemMap = new Map<number, Item & { emails: string[] }>();
+        const itemMap = new Map<number, Item & { emails: string[]; }>();
         for (const data of allItemsAndUsers) {
             if (!itemMap.has(data.id)) {
                 // Initialize the unique item with an empty emails array
@@ -42,7 +42,7 @@ export async function checkStock(db: Database, config: Config) {
             }
         }
         const uniqueItems = Array.from(itemMap.values());
-        
+
         // console.log(`Checking stock for ${uniqueItems.length} unique items...`);
 
         const browser = await puppeteer.launch({
@@ -80,7 +80,7 @@ export async function checkStock(db: Database, config: Config) {
                 // console.log(`!!! ${item.name} IS IN STOCK !!! Sending notifications...`);
                 for (const email of item.emails) {
                     console.log(` -> Emailing ${email}...`);
-                    await sendNotification(email, item);
+                    await sendNotification(email, item, currentConfig);
                 }
                 await db.updateItemStatus(item.id, status);
             } else if (status !== Status.ERROR) {

@@ -23,3 +23,9 @@ create table if not exists user_items (
     foreign key (user_id) references "user"(id) on delete cascade,
     foreign key (item_id) references items(id) on delete cascade
 );
+
+create table if not exists config (
+    interval int default 60,
+    resend_api_key varchar(255),
+    from_email varchar(255)
+);

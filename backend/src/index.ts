@@ -3,11 +3,8 @@ import cors from 'cors';
 import { createRouter } from './routes';
 import { Database, Status, Website, Item } from './db';
 import { checkStock } from './checker';
-import { loadConfig } from './helpers';
 
 async function main() {
-    const config = loadConfig();
-
     const db = new Database();
     await db.ping();
 
@@ -20,7 +17,7 @@ async function main() {
         console.log('API Server running on port 3001');
     });
 
-    checkStock(db, config);
+    checkStock(db);
 }
 
 main().catch(console.error);

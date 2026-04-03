@@ -1,28 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import { Item } from './db';
+import { Item, Config } from './db';
 import { Resend } from 'resend';
 
-export interface Config {
-    checkIntervalSeconds?: number;
-    resendApiKey: string;
-    emailFrom: string;
-    emailTo: string[];
-    items: Item[];
-}
 
-const CONFIG_PATH = path.resolve(__dirname, '../config/config.json');
-const config = loadConfig();
-
-export function loadConfig(): Config {
-    if (!fs.existsSync(CONFIG_PATH)) {
-        console.error(`Config file not found at ${CONFIG_PATH}`);
-        process.exit(1);
-    }
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
-}
-
-export async function sendNotification(to: string, item: Item) {
+export async function sendNotification(to: string, item: Item, config: Config) {
     const resend = new Resend(config.resendApiKey);
 
     try {
