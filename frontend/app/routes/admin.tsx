@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE } from '~/root';
 
 interface AssociatedUser {
     user_id: number;
