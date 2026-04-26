@@ -35,7 +35,7 @@ export default function AdminPage() {
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch(`http://${API_BASE}/api/users`);
+            const res = await fetch(`/api/users`);
             if (res.ok) {
                 const data = await res.json();
                 setUsers(data);
@@ -50,7 +50,7 @@ export default function AdminPage() {
 
     const fetchItems = async () => {
         try {
-            const res = await fetch(`http://${API_BASE}/api/users`);
+            const res = await fetch(`/api/users`);
             if (res.ok) {
                 const data = await res.json();
                 const grouped = data.reduce((acc: any, row: any) => {
@@ -88,7 +88,7 @@ export default function AdminPage() {
     const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch(`http://${API_BASE}/api/users`, {
+            const res = await fetch(`/api/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -112,7 +112,7 @@ export default function AdminPage() {
             return;
         }
         try {
-            const res = await fetch(`http://${API_BASE}/api/items`, {
+            const res = await fetch(`/api/items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -139,7 +139,7 @@ export default function AdminPage() {
 
     const handleRemoveUserFromItem = async (itemId: number, removeUserId: number) => {
         try {
-            const res = await fetch(`http://${API_BASE}/api/user-items`, {
+            const res = await fetch(`/api/user-items`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: removeUserId, itemId })
@@ -157,7 +157,7 @@ export default function AdminPage() {
 
     const handleAddUserToItem = async (itemId: number, attachUserId: number) => {
         try {
-            const res = await fetch(`http://${API_BASE}/api/user-items`, {
+            const res = await fetch(`/api/user-items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: attachUserId, itemId })
@@ -175,7 +175,7 @@ export default function AdminPage() {
 
     const handleDeleteItem = async (itemId: number) => {
         try {
-            const res = await fetch(`http://${API_BASE}/api/items/${itemId}`, { method: 'DELETE' });
+            const res = await fetch(`/api/items/${itemId}`, { method: 'DELETE' });
             if (res.ok) {
                 setMessage('Item deleted completely.');
                 fetchItems();
