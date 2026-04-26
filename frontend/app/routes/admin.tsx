@@ -49,7 +49,7 @@ export default function AdminPage() {
 
     const fetchItems = async () => {
         try {
-            const res = await fetch(`/api/users`);
+            const res = await fetch(`/api/items`);
             if (res.ok) {
                 const data = await res.json();
                 const grouped = data.reduce((acc: any, row: any) => {
