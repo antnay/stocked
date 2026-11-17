@@ -1,5 +1,5 @@
 create type status as enum ('in_stock', 'out_of_stock', 'error');
-create type website as enum ('target', 'vibram', 'amazon');
+create type website as enum ('target', 'vibram', 'amazon', 'rhode');
 
 create table if not exists items (
     id int primary key generated always as identity,
@@ -8,6 +8,8 @@ create table if not exists items (
     website website not null,
     size varchar(10),
     last_status status default 'out_of_stock' not null,
+    check_interval_seconds int default 300 not null,
+    last_checked_at timestamp,
     created_at timestamp default current_timestamp
 );
 

@@ -6,6 +6,7 @@ import { targetOpenItems } from './websites/target';
 import { vibramOpenItems } from './websites/vibram';
 import { rhodeOpenItems } from './websites/rhode';
 import { sendNotification } from './helpers';
+import { loadConfig } from './config';
 import { exit } from 'node:process';
 
 puppeteer.use(StealthPlugin());
@@ -21,13 +22,15 @@ export async function checkStock(db: Database) {
     while (true) {
         let currentConfig: Config;
         try {
-            currentConfig = await db.getConfig();
+            currentConfig = loadConfig();
         } catch (e) {
             console.error("Failed to reload config", e);
             exit(1);
         }
-        const checkInterval = (currentConfig.interval || 300) * 1000;
-        const allItemsAndUsers = await db.getAllItemsAndUsers();
+        // Base poll cadence: how often we wake to look for items whose own
+        // per-item interval is due. Per-item intervals are respected at this granularity.
+        const baseTick = (currentConfig.interval || 60) * 1000;
+        const allItemsAndUsers = await db.getDueItemsAndUsers();
 
         // Group items by unique id, collecting all attached emails
         const itemMap = new Map<number, Item & { emails: string[]; }>();
@@ -44,6 +47,12 @@ export async function checkStock(db: Database) {
             }
         }
         const uniqueItems = Array.from(itemMap.values());
+
+        // Nothing is due this tick: skip the (expensive) browser launch and wait.
+        if (uniqueItems.length === 0) {
+            await new Promise(r => setTimeout(r, baseTick));
+            continue;
+        }
 
         // console.log(`Checking stock for ${uniqueItems.length} unique items...`);
 
@@ -95,12 +104,15 @@ export async function checkStock(db: Database) {
                 await initPage();
             }
 
+            // Record the check so this item isn't re-checked until its own interval elapses.
+            await db.markItemChecked(item.id);
+
             await new Promise(r => setTimeout(r, 100));
         }
 
         await browser.close();
 
-        // console.log(`Cycle complete. Waiting ${checkInterval / 1000} seconds...`);
-        await new Promise(r => setTimeout(r, checkInterval));
+        // console.log(`Cycle complete. Waiting ${baseTick / 1000} seconds...`);
+        await new Promise(r => setTimeout(r, baseTick));
     }
 }

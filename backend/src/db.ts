@@ -45,9 +45,18 @@ export class Database {
         }
     }
 
-    async addItem(url: string, name: string, website: Website, size: string | null, status: Status) {
-        const res = await this.pool.query("INSERT INTO items (url, name, website, size, last_status) VALUES ($1, $2, $3, $4, $5) RETURNING *", [url, name, website, size, status]);
+    async addItem(url: string, name: string, website: Website, size: string | null, status: Status, checkIntervalSeconds: number) {
+        const res = await this.pool.query("INSERT INTO items (url, name, website, size, last_status, check_interval_seconds) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", [url, name, website, size, status, checkIntervalSeconds]);
         return res.rows[0];
+    }
+
+    async updateItemInterval(itemId: number, checkIntervalSeconds: number) {
+        const res = await this.pool.query("UPDATE items SET check_interval_seconds = $1 WHERE id = $2 RETURNING *", [checkIntervalSeconds, itemId]);
+        return res.rows[0];
+    }
+
+    async markItemChecked(itemId: number) {
+        await this.pool.query("UPDATE items SET last_checked_at = now() WHERE id = $1", [itemId]);
     }
 
     async getItems() {
@@ -110,15 +119,11 @@ export class Database {
         return res.rows;
     }
 
-    async getConfig(): Promise<Config> {
-        const res = await this.pool.query("SELECT * FROM config");
-        return res.rows[0];
+    async getDueItemsAndUsers() {
+        const res = await this.pool.query("SELECT items.*, user_items.user_id, \"user\".email FROM items JOIN user_items ON items.id = user_items.item_id JOIN \"user\" ON user_items.user_id = \"user\".id WHERE items.last_checked_at IS NULL OR items.last_checked_at <= now() - (items.check_interval_seconds * interval '1 second')");
+        return res.rows;
     }
 
-    async updateConfig(checkIntervalSeconds: number, resendApiKey: string, emailFrom: string) {
-        const res = await this.pool.query("UPDATE config SET check_interval_seconds = $1, resend_api_key = $2, email_from = $3", [checkIntervalSeconds, resendApiKey, emailFrom]);
-        return res.rows[0];
-    }
 }
 
 export interface Item {
@@ -128,6 +133,8 @@ export interface Item {
     website: Website;
     size: string | null;
     lastStatus: Status;
+    checkIntervalSeconds: number;
+    lastCheckedAt: Date | null;
     createdAt: Date;
 }
 
