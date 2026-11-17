@@ -1,11 +1,14 @@
 services:
   traefik:
-    image: traefik:v3.1
+    image: traefik:v3.7
     container_name: item-tracker-proxy
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+    environment:
+      # Force a modern Docker API version; the daemon rejects Traefik's default (1.24).
+      - DOCKER_API_VERSION=1.44
     ports:
       - "${STOCKED_PORT:-8080}:80"
     volumes:
@@ -56,6 +59,9 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME:-item_tracker}
+      # postgres:18 moved the default data dir; pin it to the old location so the
+      # existing volume (data at /var/lib/postgresql/data) keeps working without migration.
+      - PGDATA=/var/lib/postgresql/data
     volumes:
       - item_tracker_db_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
