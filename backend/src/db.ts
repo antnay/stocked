@@ -10,7 +10,8 @@ export enum Status {
 export enum Website {
     TARGET = "target",
     VIBRAM = "vibram",
-    AMAZON = "amazon"
+    AMAZON = "amazon",
+    RHODE = "rhode"
 }
 
 export class Database {

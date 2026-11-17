@@ -4,6 +4,7 @@ import { Database, Website, Status, Item, Config } from './db';
 import { amazonOpenItems } from './websites/amazon';
 import { targetOpenItems } from './websites/target';
 import { vibramOpenItems } from './websites/vibram';
+import { rhodeOpenItems } from './websites/rhode';
 import { sendNotification } from './helpers';
 import { exit } from 'node:process';
 
@@ -13,6 +14,7 @@ const scrapers = {
     [Website.TARGET]: targetOpenItems,
     [Website.VIBRAM]: vibramOpenItems,
     [Website.AMAZON]: amazonOpenItems,
+    [Website.RHODE]: rhodeOpenItems,
 };
 
 export async function checkStock(db: Database) {

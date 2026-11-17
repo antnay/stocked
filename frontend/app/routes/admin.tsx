@@ -276,6 +276,7 @@ export default function AdminPage() {
                                         <option value="target">Target</option>
                                         <option value="vibram">Vibram</option>
                                         <option value="amazon">Amazon</option>
+                                        <option value="rhode">Rhode</option>
                                     </select>
                                 </div>
                                 <div className="flex flex-col space-y-2">
