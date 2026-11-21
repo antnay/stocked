@@ -5,6 +5,7 @@ import { amazonOpenItems } from './websites/amazon';
 import { targetOpenItems } from './websites/target';
 import { vibramOpenItems } from './websites/vibram';
 import { rhodeOpenItems } from './websites/rhode';
+import { goodchaOpenItems } from './websites/goodcha';
 import { sendNotification } from './helpers';
 import { loadConfig } from './config';
 import { exit } from 'node:process';
@@ -16,6 +17,7 @@ const scrapers = {
     [Website.VIBRAM]: vibramOpenItems,
     [Website.AMAZON]: amazonOpenItems,
     [Website.RHODE]: rhodeOpenItems,
+    [Website.GOODCHA]: goodchaOpenItems,
 };
 
 export async function checkStock(db: Database) {

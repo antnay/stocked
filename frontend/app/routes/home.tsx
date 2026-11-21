@@ -45,7 +45,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg text-neutral-400">
-            stocked keeps an eye on the items you want across Target, Amazon, Vibram and Rhode —
+            stocked keeps an eye on the items you want across Target, Amazon, Vibram, Rhode and GOOD CHĀ —
             and emails you the instant they're back, on a schedule you control per item.
           </p>
 
@@ -62,7 +62,7 @@ export default function Home() {
             {[
               { title: "Per-item timing", body: "Set how often each item is checked — seconds or hours." },
               { title: "Instant email alerts", body: "The moment stock flips, the right people get notified." },
-              { title: "Multi-store", body: "Target, Amazon, Vibram and Rhode supported out of the box." },
+              { title: "Multi-store", body: "Target, Amazon, Vibram, Rhode and GOOD CHĀ supported out of the box." },
             ].map((f) => (
               <div
                 key={f.title}

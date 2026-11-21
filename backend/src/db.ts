@@ -11,7 +11,8 @@ export enum Website {
     TARGET = "target",
     VIBRAM = "vibram",
     AMAZON = "amazon",
-    RHODE = "rhode"
+    RHODE = "rhode",
+    GOODCHA = "goodcha"
 }
 
 export class Database {
