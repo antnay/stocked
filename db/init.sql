@@ -1,11 +1,13 @@
 create type status as enum ('in_stock', 'out_of_stock', 'error');
-create type website as enum ('target', 'vibram', 'amazon', 'rhode');
+-- `website` is plain text (not an enum) so adding support for a new store only
+-- requires app code changes — no DB migration. The allowed values live in the
+-- `Website` enum in backend/src/db.ts.
 
 create table if not exists items (
     id int primary key generated always as identity,
     url varchar(255) not null,
     name varchar(255) not null,
-    website website not null,
+    website text not null,
     size varchar(10),
     last_status status default 'out_of_stock' not null,
     check_interval_seconds int default 300 not null,
