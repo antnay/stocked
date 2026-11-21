@@ -5,10 +5,10 @@ create type status as enum ('in_stock', 'out_of_stock', 'error');
 
 create table if not exists items (
     id int primary key generated always as identity,
-    url varchar(255) not null,
-    name varchar(255) not null,
+    url text not null,
+    name text not null,
     website text not null,
-    size varchar(10),
+    size text,
     last_status status default 'out_of_stock' not null,
     check_interval_seconds int default 300 not null,
     last_checked_at timestamp,
